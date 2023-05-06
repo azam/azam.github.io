@@ -6,6 +6,8 @@ import purify from 'https://unpkg.com/dompurify/dist/purify.es.js';
 // Thank you https://egghead.io/blog/github-issues-powered-blog
 
 const html = htm.bind(React.createElement);
+const OWNER = 'azam';
+const REPO = 'azam.github.io';
 const TOKEN = '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';
 
 const Posts = (props) => {
@@ -13,18 +15,21 @@ const Posts = (props) => {
 
     React.useEffect(() => {
         async function fetchIssues() {
-            const { url, ...options } = endpoint('GET /repos/:owner/:repo/issues', {
-                owner: 'azam',
-                repo: 'azam.github.io',
-                auth: TOKEN,
+            const { url, ...options } = endpoint({
+                method: 'GET',
+                url: `/repos/${OWNER}/${REPO}/issues`,
+                creator: OWNER,
+                labels: 'publish',
+                headers: {
+                    authorization: `token ${TOKEN}`
+                },
             });
             const response = await fetch(url, options);
             const issues = await response.json();
             // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
             issues && issues.forEach((issue) => {
-                console.log(issue);
+                // console.log(issue);
                 issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
-                console.log(issue.parsed);
             });
             setIssues(issues);
         }
