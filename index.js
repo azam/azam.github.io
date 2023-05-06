@@ -1,15 +1,16 @@
-
 import { React, ReactDOM } from 'https://unpkg.com/es-react@16.13.1';
 import htm from 'https://unpkg.com/htm?module';
 import { endpoint } from 'https://cdn.skypack.dev/@octokit/endpoint';
-
+import { marked } from 'https://unpkg.com/marked/lib/marked.esm.js';
+import purify from 'https://unpkg.com/dompurify/dist/purify.es.js';
 // Thank you https://egghead.io/blog/github-issues-powered-blog
 
 const html = htm.bind(React.createElement);
 const TOKEN = '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';
 
 const Posts = (props) => {
-    const [issues, setIssues] = React.useState([])
+    const [issues, setIssues] = React.useState([]);
+
     React.useEffect(() => {
         async function fetchIssues() {
             const { url, ...options } = endpoint('GET /repos/:owner/:repo/issues', {
@@ -19,19 +20,29 @@ const Posts = (props) => {
             });
             const response = await fetch(url, options);
             const issues = await response.json();
+            // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
+            issues && issues.forEach((issue) => {
+                console.log(issue);
+                issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
+                console.log(issue.parsed);
+            });
             setIssues(issues);
         }
         fetchIssues();
     }, []);
+
     return html`
-        ${issues.map(({ number, title, body }) => {
+        ${issues.map(({ created_at, updated_at, closed_at, labels, html_url, number, title, parsed, body }) => {
         return html`
-                <div id=${number} key=${number}>
-                    <h1>${title}</h1>
-                    <div>${body}</div>
+            <article class="message">
+                <div class="message-header">
+                    <span>${title}</span>
+                    <a href="${html_url}">#${number}</a>
                 </div>
-            `;
-        })}
+                <div class="message-body" dangerouslySetInnerHTML=${parsed}></div>
+            </article>
+        `;
+    })}
     `;
 };
 
