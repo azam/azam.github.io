@@ -8,7 +8,7 @@ import purify from 'https://unpkg.com/dompurify/dist/purify.es.js';
 const html = htm.bind(React.createElement);
 const OWNER = 'azam';
 const REPO = 'azam.github.io';
-const TOKEN = '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';
+// const TOKEN = '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';
 
 const Posts = (props) => {
     const [issues, setIssues] = React.useState([]);
@@ -20,18 +20,23 @@ const Posts = (props) => {
                 url: `/repos/${OWNER}/${REPO}/issues`,
                 creator: OWNER,
                 labels: 'publish',
-                headers: {
-                    authorization: `token ${TOKEN}`
-                },
+                // This is a public repo, so authorizeation is not needed
+                // headers: {
+                //     authorization: `token ${TOKEN}`
+                // },
             });
-            const response = await fetch(url, options);
-            const issues = await response.json();
-            // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
-            issues && issues.forEach((issue) => {
-                // console.log(issue);
-                issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
-            });
-            setIssues(issues);
+            try {
+                const response = await fetch(url, options);
+                const issues = await response.json();
+                // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
+                issues && issues.forEach((issue) => {
+                    // console.log(issue);
+                    issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
+                });
+                setIssues(issues);
+            } catch (err) {
+                console.error(err);
+            }
         }
         fetchIssues();
     }, []);
