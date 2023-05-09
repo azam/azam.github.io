@@ -1,33 +1,298 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- https://unpkg.com/bulma@0.9/css/bulma.min.css -->
+    <!-- <link
+      rel="preload"
+      as="style"
+      href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css" /> -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://unpkg.com/@codomatech/bulma50shades/dist/material--deep-purple-800.min.css" />
+    <!-- <link
+      rel="stylesheet"
+      href="https://unpkg.com/@codomatech/bulma50shades/dist/material--deep-purple-800.min.css" /> -->
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <!-- <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css"> -->
-    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css">
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css"
+      data-light-href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css"
+      data-dark-href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
+      data-light-href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
+      data-dark-href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css" />
     <style>
-        .message-body p:not(:last-child) {
-            margin-bottom: 1.0rem;
-        }
+      /* START: overrides */
+      body.has-navbar-fixed-top {
+        padding-top: 2.5rem; /** Original: 3.25rem **/
+      }
+
+      html[data-theme='dark'] .message-body code,
+      html[data-theme='dark'] .message-body pre {
+        background-color: #1f2424;
+      }
+      code {
+        color: #b85e55;
+      }
+      /* END: overrides */
+
+      /* custom navbar. always shown */
+      .navbar-fixed-top {
+        display: flex;
+        align-items: stretch;
+        top: 0;
+        left: 0;
+        position: fixed;
+        right: 0;
+        z-index: 30;
+        background-color: transparent !important;
+        min-height: 2.5rem;
+      }
+      .navbar-fixed-top .navbar-right-box {
+        display: flex;
+        justify-content: flex-end;
+        margin-left: auto;
+      }
+      .navbar-fixed-top .navbar-left-box {
+        display: flex;
+        justify-content: flex-start;
+      }
+      .message-body p:not(:last-child) {
+        margin-bottom: 1rem;
+      }
+      .issue-created-at {
+        font-style: italic;
+      }
+      .circled {
+        border: 1px solid;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        text-align: center;
+      }
+      html[data-theme='dark'] .is-hidden-dark {
+        display: none;
+      }
+      html[data-theme='light'] .is-hidden-light {
+        display: none;
+      }
+      /* The poor man's dark mode */
+      /* html[data-theme='dark'] {
+        filter: invert(100%);
+      } */
     </style>
     <title>azam</title>
-</head>
+  </head>
 
-<body>
-    <section class="hero is-primary">
-        <div class="hero-body">
-            <p class="title">azam.github.io</p>
-            <p class="subtitle">
-                <a href="https://github.com/azam">@azam</a>
-            </p>
-        </div>
-    </section>
+  <body class="has-navbar-fixed-top">
+    <nav
+      class="navbar-fixed-top"
+      role="navigation"
+      aria-label="main navigation">
+      <!-- <div class="navbar-left-box">
+        <a class="button navbar-item">xx</a>
+        <a class="button navbar-item">yy</a>
+      </div> -->
+      <div class="navbar-right-box">
+        <a
+          class="circled icon is-medium is-size-4 is-hidden-light"
+          onclick="applyTheme('light')"
+          >☀</a
+        >
+        <a
+          class="circled icon is-medium is-size-4 is-hidden-dark"
+          onclick="applyTheme('dark')"
+          >☾</a
+        >
+      </div>
+    </nav>
     <section class="section">
-        <div id="issues" class="container"></div>
+      <div id="issues" class="container"></div>
     </section>
-    <script type="module" src="index.js"></script>
-</body>
+    <template id="issue-template">
+      <article class="message">
+        <div class="message-header">
+          <a href="" class="issue-title"></a>
+          <a href="#" class="issue-link"></a>
+        </div>
+        <div class="message-body">
+          <div class="block issue-header">
+            <time class="issue-created-at"></time>
+          </div>
+          <div class="block issue-body"></div>
+        </div>
+      </article>
+    </template>
+    <script type="module">
+      import { marked } from 'https://unpkg.com/marked@5/lib/marked.esm.js';
+      import { markedHighlight } from 'https://unpkg.com/marked-highlight@1/src/index.js';
+      import hljs from 'https://unpkg.com/@highlightjs/cdn-assets@11/es/highlight.min.js';
+      import purify from 'https://unpkg.com/dompurify@3/dist/purify.es.js';
 
+      // Locale settings. Static atm.
+      const LANG_CODE = document.documentElement.lang || navigator.language;
+      const DATETIME_FORMAT = new Intl.DateTimeFormat(LANG_CODE, {
+        dateStyle: 'long',
+        timeStyle: 'short',
+      });
+
+      // Github repo settings
+      const OWNER = 'azam';
+      const REPO = 'azam.github.io';
+      const ISSUES_URL = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
+
+      // darklight.js @azam
+      // USAGE:
+      // 1. Call `applyTheme()` on page load.
+      // 2. Either use `html[data-theme='dark']` selector on CSS,
+      //             or
+      //    Add callback `THEME_CALLBACK.set('theme-change-handler', (theme) => {console.log('theme changed to ' + theme)})`
+      const THEME_STORAGE = 'theme';
+      const THEME_LIGHT = 'light';
+      const THEME_DARK = 'dark';
+      const THEME_CALLBACKS = new Map();
+      const preferredTheme = () => {
+        return localStorage.getItem(THEME_STORAGE)
+          ? localStorage.getItem(THEME_STORAGE)
+          : window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? THEME_DARK
+          : THEME_LIGHT;
+      };
+      const THEME = { value: preferredTheme() };
+      const toggleTheme = () => {
+        applyTheme(THEME.value === THEME_LIGHT ? THEME_DARK : THEME_LIGHT);
+      };
+      const resetTheme = () => {
+        localStorage.clear(THEME_STORAGE);
+        delete document.firstElementChild.dataset.theme;
+      };
+      const applyTheme = (value) => {
+        value = value ? value : THEME.value;
+        THEME.value = value;
+        localStorage.setItem(THEME_STORAGE, value);
+        document.firstElementChild.dataset.theme = value;
+        THEME_CALLBACKS.forEach((f, k) => {
+          if (f && typeof f === 'function') f.call(null, value);
+        });
+      };
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', ({ matches: isDark }) => {
+          applyTheme(isDark ? THEME_DARK : THEME_LIGHT);
+        });
+      // darklight.js @azam
+
+      const loadIssues = async () => {
+        let url = new URL(ISSUES_URL);
+        url.searchParams.append('creator', OWNER);
+        url.searchParams.append('state', 'all');
+        url.searchParams.append('labels', 'publish');
+        try {
+          // const res = await fetch('issues.json');
+          const res = await fetch(url);
+          const issues = await res.json();
+          if (Array.isArray(issues) && issues.length > 0) {
+            const tmpl = document.getElementById('issue-template');
+            const frag = document.createDocumentFragment();
+            issues.forEach((issue) => {
+              const item = tmpl.content.firstElementChild.cloneNode(true);
+              item.querySelector('.issue-title').id = `issue-${issue.number}`;
+              item.querySelector(
+                '.issue-title'
+              ).href = `#issue-${issue.number}`;
+              item.querySelector('.issue-title').textContent = issue.title;
+              item.querySelector(
+                '.issue-link'
+              ).textContent = `#${issue.number}`;
+              item.querySelector('.issue-link').href = issue.html_url;
+              item.querySelector('.issue-created-at').datetime =
+                issue.created_at;
+              item.querySelector('.issue-created-at').textContent =
+                DATETIME_FORMAT.format(new Date(issue.created_at));
+              if (Array.isArray(issue.labels) && issue.labels.length > 1) {
+                const header = item.querySelector('.issue-header');
+                issue.labels
+                  .filter((l) => l.name !== 'publish')
+                  .forEach((label) => {
+                    const tag = document.createElement('a');
+                    tag.textContent = label.name;
+                    tag.href = `https://github.com/${OWNER}/${REPO}/issues?q=label%3A${encodeURIComponent(
+                      label.name
+                    )}`;
+                    tag.classList.add(
+                      'issue-tag',
+                      'tag',
+                      'is-normal',
+                      'is-light',
+                      'is-link'
+                    );
+                    header.appendChild(tag);
+                  });
+              }
+              item.querySelector('.issue-header');
+              item.querySelector('.issue-body').innerHTML = purify.sanitize(
+                marked.parse(issue.body)
+              );
+              frag.appendChild(item);
+            });
+            document.getElementById('issues').appendChild(frag);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      const loadPage = () => {
+        THEME_CALLBACKS.set('css-changer', (theme) => {
+          if (theme == THEME_LIGHT) {
+            document.body.classList.remove('dark');
+            document
+              .querySelectorAll('link[rel="stylesheet"]')
+              .forEach((css) => {
+                css.dataset.lightHref && (css.href = css.dataset.lightHref);
+              });
+          } else if (theme == THEME_DARK) {
+            document.body.classList.add('dark');
+            document
+              .querySelectorAll('link[rel="stylesheet"]')
+              .forEach((css) => {
+                css.dataset.darkHref && (css.href = css.dataset.darkHref);
+              });
+          }
+        });
+        applyTheme();
+        marked.use(
+          markedHighlight({
+            langPrefix: 'hljs language-',
+            highlight(code, lang) {
+              const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+              return hljs.highlight(code, { language }).value;
+            },
+          })
+        );
+        loadIssues();
+        // expose as global. yeah, roast me.
+        window['applyTheme'] = applyTheme;
+      };
+
+      document.addEventListener('DOMContentLoaded', loadPage);
+    </script>
+  </body>
 </html>
