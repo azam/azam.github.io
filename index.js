@@ -2,7 +2,9 @@ import { React, ReactDOM } from 'https://unpkg.com/es-react@16.13.1';
 import htm from 'https://unpkg.com/htm?module';
 import { endpoint } from 'https://cdn.skypack.dev/@octokit/endpoint';
 import { marked } from 'https://unpkg.com/marked/lib/marked.esm.js';
+import hljs from 'https://unpkg.com/@highlightjs/cdn-assets@11/es/highlight.min.js';
 import purify from 'https://unpkg.com/dompurify/dist/purify.es.js';
+
 // Thank you https://egghead.io/blog/github-issues-powered-blog
 
 const html = htm.bind(React.createElement);
@@ -24,8 +26,13 @@ const Posts = (props) => {
             try {
                 const response = await fetch(url, options);
                 const issues = await response.json();
-                // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
                 if (Array.isArray(issues)) {
+                    marked.setOptions({
+                        langPrefix: '',
+                        highlight: (code, lang) => {
+                            return hljs.highlightAuto(code, [lang]).value;
+                        },
+                    });
                     issues.forEach((issue) => {
                         issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
                     });
@@ -46,7 +53,15 @@ const Posts = (props) => {
                     <span>${title}</span>
                     <a href="${html_url}">#${number}</a>
                 </div>
-                <div class="message-body" dangerouslySetInnerHTML=${parsed}></div>
+                <div class="message-body">
+                    <div class="block">
+                        <span><i>${created_at}</i></span>
+                        ${Array.isArray(labels) && labels.filter(l => l.name !== 'publish').map(({ name }) => {
+                            return html`<a href="https://github.com/azam/azam.github.io/issues?q=label%3A${name}" class="tag is-link is-light is-normal">${name}</a>`;
+                        })}
+                    </div>
+                    <div class="block" dangerouslySetInnerHTML=${parsed}></div>
+                </div>
             </article>
         `;
     })}
