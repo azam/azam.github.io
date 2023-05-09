@@ -8,7 +8,6 @@ import purify from 'https://unpkg.com/dompurify/dist/purify.es.js';
 const html = htm.bind(React.createElement);
 const OWNER = 'azam';
 const REPO = 'azam.github.io';
-// const TOKEN = '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';
 
 const Posts = (props) => {
     const [issues, setIssues] = React.useState([]);
@@ -21,10 +20,6 @@ const Posts = (props) => {
                 creator: OWNER,
                 state: 'all',
                 labels: 'publish',
-                // This is a public repo, so authorizeation is not needed
-                // headers: {
-                //     authorization: `token ${TOKEN}`
-                // },
             });
             try {
                 const response = await fetch(url, options);
@@ -32,7 +27,6 @@ const Posts = (props) => {
                 // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
                 if (Array.isArray(issues)) {
                     issues.forEach((issue) => {
-                        // console.log(issue);
                         issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
                     });
                     setIssues(issues);
