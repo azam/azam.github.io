@@ -29,11 +29,13 @@ const Posts = (props) => {
                 const response = await fetch(url, options);
                 const issues = await response.json();
                 // const issues = [{ number: 2, title: 'title', body: 'foobar\n* one\n* two' }]
-                issues && issues.forEach((issue) => {
-                    // console.log(issue);
-                    issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
-                });
-                setIssues(issues);
+                if (Array.isArray(issues)) {
+                    issues.forEach((issue) => {
+                        // console.log(issue);
+                        issue.parsed = { __html: purify.sanitize(marked.parse(issue.body)) };
+                    });
+                    setIssues(issues);
+                }
             } catch (err) {
                 console.error(err);
             }
