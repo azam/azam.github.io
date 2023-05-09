@@ -19,6 +19,7 @@ const Posts = (props) => {
                 method: 'GET',
                 url: `/repos/${OWNER}/${REPO}/issues`,
                 creator: OWNER,
+                state: 'all',
                 labels: 'publish',
                 // This is a public repo, so authorizeation is not needed
                 // headers: {
