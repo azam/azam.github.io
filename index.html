@@ -3,31 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="azam development notes" />
     <!-- https://unpkg.com/bulma@0.9/css/bulma.min.css -->
+    <link rel="preload" as="style" href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css" />
     <!-- <link
       rel="preload"
       as="style"
-      href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css" /> -->
-    <link
-      rel="preload"
-      as="style"
-      href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" />
-    <link
-      rel="preload"
-      as="style"
-      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css" />
-    <link
-      rel="preload"
-      as="style"
-      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css" />
-    <link
-      rel="preload"
-      as="style"
-      href="https://unpkg.com/@codomatech/bulma50shades/dist/material--deep-purple-800.min.css" />
+      href="https://unpkg.com/@codomatech/bulma50shades/dist/material--deep-purple-800.min.css" /> -->
     <!-- <link
       rel="stylesheet"
       href="https://unpkg.com/@codomatech/bulma50shades/dist/material--deep-purple-800.min.css" /> -->
-
     <link
       rel="stylesheet"
       href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css"
@@ -43,7 +31,6 @@
       body.has-navbar-fixed-top {
         padding-top: 2.5rem; /** Original: 3.25rem **/
       }
-
       html[data-theme='dark'] .message-body code,
       html[data-theme='dark'] .message-body pre {
         background-color: #1f2424;
@@ -57,41 +44,61 @@
       .navbar-fixed-top {
         display: flex;
         align-items: stretch;
+        position: fixed;
         top: 0;
         left: 0;
-        position: fixed;
         right: 0;
         z-index: 30;
         background-color: transparent !important;
         min-height: 2.5rem;
+        padding: 16px 16px 0px 16px;
       }
       .navbar-fixed-top .navbar-right-box {
         display: flex;
         justify-content: flex-end;
         margin-left: auto;
+        width: 50%;
       }
       .navbar-fixed-top .navbar-left-box {
         display: flex;
         justify-content: flex-start;
+        width: 50%;
       }
-      .message-body p:not(:last-child) {
+      .message-body *:not(:last-child) {
         margin-bottom: 1rem;
       }
       .issue-created-at {
         font-style: italic;
       }
-      .circled {
+      .navbar-search input {
+        background-color: transparent !important;
+        width: 0;
+        transition: margin-left 500ms ease; /* all 200ms ease */
+      }
+      .navbar-search:focus input,
+      .navbar-search:hover input,
+      .navbar-search:active input {
+        width: 100%;
+      }
+      .navbar-action-button {
+        display: flex;
+        flex: 0 0 2rem;
+        width: 2rem;
+        height: 2rem;
         border: 1px solid;
         border-radius: 50%;
-        display: flex;
         align-items: center;
         text-align: center;
       }
+      html[data-theme='dark'] .navbar-search input {
+        background-color: transparent !important;
+        filter: invert(100%);
+      }
       html[data-theme='dark'] .is-hidden-dark {
-        display: none;
+        display: none !important;
       }
       html[data-theme='light'] .is-hidden-light {
-        display: none;
+        display: none !important;
       }
       /* The poor man's dark mode */
       /* html[data-theme='dark'] {
@@ -102,25 +109,22 @@
   </head>
 
   <body class="has-navbar-fixed-top">
-    <nav
-      class="navbar-fixed-top"
-      role="navigation"
-      aria-label="main navigation">
-      <!-- <div class="navbar-left-box">
-        <a class="button navbar-item">xx</a>
-        <a class="button navbar-item">yy</a>
-      </div> -->
-      <div class="navbar-right-box">
-        <a
-          class="circled icon is-medium is-size-4 is-hidden-light"
-          onclick="applyTheme('light')"
-          >☀</a
-        >
-        <a
-          class="circled icon is-medium is-size-4 is-hidden-dark"
-          onclick="applyTheme('dark')"
-          >☾</a
-        >
+    <nav class="navbar-fixed-top" role="navigation" aria-label="main navigation">
+      <div class="navbar-left-box">
+        <a class="is-size-3" href="https://github.com/azam">@azam</a>
+      </div>
+      <div class="navbar-right-box field is-transparent">
+        <div class="navbar-search control has-icons-left">
+          <input
+            id="navbar-search-input"
+            class="input is-small is-rounded"
+            type="text"
+            placeholder="Search"
+            onkeydown="searchIssue(event)" />
+          <span class="icon is-medium is-left">🔍</span>
+        </div>
+        <a class="navbar-action-button icon is-hidden-light" onclick="applyTheme('light')" href="#"> ☀ </a>
+        <a class="navbar-action-button icon is-hidden-dark" onclick="applyTheme('dark')" href="#"> ☾ </a>
       </div>
     </nav>
     <section class="section">
@@ -156,7 +160,8 @@
       // Github repo settings
       const OWNER = 'azam';
       const REPO = 'azam.github.io';
-      const ISSUES_URL = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
+      const ISSUES_API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
+      const ISSUES_WEB_URL = `https://github.com/${OWNER}/${REPO}/issues`;
 
       // darklight.js @azam
       // USAGE:
@@ -192,15 +197,23 @@
           if (f && typeof f === 'function') f.call(null, value);
         });
       };
-      window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', ({ matches: isDark }) => {
-          applyTheme(isDark ? THEME_DARK : THEME_LIGHT);
-        });
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches: isDark }) => {
+        applyTheme(isDark ? THEME_DARK : THEME_LIGHT);
+      });
       // darklight.js @azam
 
+      const searchIssue = (evt) => {
+        if (evt.key === 'Enter' && evt.target.value.trim()) {
+          // https://github.com/azam/azam.github.io/issues?q=is%3Aissue+label%3Apublish+ffmpeg
+          const queries = ['is:issue', 'label:publish', evt.target.value.trim()];
+          const url = new URL(ISSUES_WEB_URL);
+          url.searchParams.append('q', queries.join(' '));
+          window.open(url.toString(), '_blank');
+        }
+      };
+
       const loadIssues = async () => {
-        let url = new URL(ISSUES_URL);
+        let url = new URL(ISSUES_API_URL);
         url.searchParams.append('creator', OWNER);
         url.searchParams.append('state', 'all');
         url.searchParams.append('labels', 'publish');
@@ -214,18 +227,12 @@
             issues.forEach((issue) => {
               const item = tmpl.content.firstElementChild.cloneNode(true);
               item.querySelector('.issue-title').id = `issue-${issue.number}`;
-              item.querySelector(
-                '.issue-title'
-              ).href = `#issue-${issue.number}`;
+              item.querySelector('.issue-title').href = `#issue-${issue.number}`;
               item.querySelector('.issue-title').textContent = issue.title;
-              item.querySelector(
-                '.issue-link'
-              ).textContent = `#${issue.number}`;
+              item.querySelector('.issue-link').textContent = `#${issue.number}`;
               item.querySelector('.issue-link').href = issue.html_url;
-              item.querySelector('.issue-created-at').datetime =
-                issue.created_at;
-              item.querySelector('.issue-created-at').textContent =
-                DATETIME_FORMAT.format(new Date(issue.created_at));
+              item.querySelector('.issue-created-at').datetime = issue.created_at;
+              item.querySelector('.issue-created-at').textContent = DATETIME_FORMAT.format(new Date(issue.created_at));
               if (Array.isArray(issue.labels) && issue.labels.length > 1) {
                 const header = item.querySelector('.issue-header');
                 issue.labels
@@ -233,23 +240,13 @@
                   .forEach((label) => {
                     const tag = document.createElement('a');
                     tag.textContent = label.name;
-                    tag.href = `https://github.com/${OWNER}/${REPO}/issues?q=label%3A${encodeURIComponent(
-                      label.name
-                    )}`;
-                    tag.classList.add(
-                      'issue-tag',
-                      'tag',
-                      'is-normal',
-                      'is-light',
-                      'is-link'
-                    );
+                    tag.href = `https://github.com/${OWNER}/${REPO}/issues?q=label%3A${encodeURIComponent(label.name)}`;
+                    tag.classList.add('issue-tag', 'tag', 'is-normal', 'is-light', 'is-link');
                     header.appendChild(tag);
                   });
               }
               item.querySelector('.issue-header');
-              item.querySelector('.issue-body').innerHTML = purify.sanitize(
-                marked.parse(issue.body)
-              );
+              item.querySelector('.issue-body').innerHTML = purify.sanitize(marked.parse(issue.body));
               frag.appendChild(item);
             });
             document.getElementById('issues').appendChild(frag);
@@ -263,18 +260,14 @@
         THEME_CALLBACKS.set('css-changer', (theme) => {
           if (theme == THEME_LIGHT) {
             document.body.classList.remove('dark');
-            document
-              .querySelectorAll('link[rel="stylesheet"]')
-              .forEach((css) => {
-                css.dataset.lightHref && (css.href = css.dataset.lightHref);
-              });
+            document.querySelectorAll('link[rel="stylesheet"][data-light-href]').forEach((css) => {
+              css.href = css.dataset.lightHref;
+            });
           } else if (theme == THEME_DARK) {
             document.body.classList.add('dark');
-            document
-              .querySelectorAll('link[rel="stylesheet"]')
-              .forEach((css) => {
-                css.dataset.darkHref && (css.href = css.dataset.darkHref);
-              });
+            document.querySelectorAll('link[rel="stylesheet"][data-dark-href]').forEach((css) => {
+              css.href = css.dataset.darkHref;
+            });
           }
         });
         applyTheme();
@@ -290,6 +283,7 @@
         loadIssues();
         // expose as global. yeah, roast me.
         window['applyTheme'] = applyTheme;
+        window['searchIssue'] = searchIssue;
       };
 
       document.addEventListener('DOMContentLoaded', loadPage);
