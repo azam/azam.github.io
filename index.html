@@ -219,8 +219,8 @@
         url.searchParams.append('state', 'all');
         url.searchParams.append('labels', 'publish');
         try {
-          const res = await fetch('issues.json');
-          // const res = await fetch(url);
+          // const res = await fetch('issues.json');
+          const res = await fetch(url);
           const issues = await res.json();
           if (Array.isArray(issues) && issues.length > 0) {
             const tmpl = document.getElementById('issue-template');
