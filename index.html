@@ -79,6 +79,7 @@
       .navbar-search:hover input,
       .navbar-search:active input {
         width: 100%;
+        backdrop-filter: opacity(30%);
       }
       .navbar-action-button {
         display: flex;
@@ -111,7 +112,7 @@
   <body class="has-navbar-fixed-top">
     <nav class="navbar-fixed-top" role="navigation" aria-label="main navigation">
       <div class="navbar-left-box">
-        <a class="is-size-3" href="https://github.com/azam">@azam</a>
+        <a class="is-size-4" href="https://github.com/azam">@azam</a>
       </div>
       <div class="navbar-right-box field is-transparent">
         <div class="navbar-search control has-icons-left">
@@ -218,8 +219,8 @@
         url.searchParams.append('state', 'all');
         url.searchParams.append('labels', 'publish');
         try {
-          // const res = await fetch('issues.json');
-          const res = await fetch(url);
+          const res = await fetch('issues.json');
+          // const res = await fetch(url);
           const issues = await res.json();
           if (Array.isArray(issues) && issues.length > 0) {
             const tmpl = document.getElementById('issue-template');
