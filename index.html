@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="azam development notes" />
     <!-- https://unpkg.com/bulma@0.9/css/bulma.min.css -->
-    <link rel="preload" as="style" href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css" />
-    <link rel="preload" as="style" href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" />
-    <link rel="preload" as="style" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css" />
-    <link rel="preload" as="style" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/bulmaswatch@0.8.1/flatly/bulmaswatch.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/bulmaswatch@0.8.1/darkly/bulmaswatch.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/@highlightjs/cdn-assets@11.10.0/styles/github.min.css" />
+    <link rel="preload" as="style" href="https://unpkg.com/@highlightjs/cdn-assets@11.10.0/styles/github-dark.min.css" />
     <!-- <link
       rel="preload"
       as="style"
@@ -18,14 +18,14 @@
       href="https://unpkg.com/@codomatech/bulma50shades/dist/material--deep-purple-800.min.css" /> -->
     <link
       rel="stylesheet"
-      href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css"
-      data-light-href="https://unpkg.com/bulmaswatch/flatly/bulmaswatch.min.css"
-      data-dark-href="https://unpkg.com/bulmaswatch/darkly/bulmaswatch.min.css" />
+      href="https://unpkg.com/bulmaswatch@0.8.1/flatly/bulmaswatch.min.css"
+      data-light-href="https://unpkg.com/bulmaswatch@0.8.1/flatly/bulmaswatch.min.css"
+      data-dark-href="https://unpkg.com/bulmaswatch@0.8.1/darkly/bulmaswatch.min.css" />
     <link
       rel="stylesheet"
-      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
-      data-light-href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
-      data-dark-href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css" />
+      href="https://unpkg.com/@highlightjs/cdn-assets@11.10.0/styles/github.min.css"
+      data-light-href="https://unpkg.com/@highlightjs/cdn-assets@11.10.0/styles/github.min.css"
+      data-dark-href="https://unpkg.com/@highlightjs/cdn-assets@11.10.0/styles/github-dark.min.css" />
     <style>
       /* START: overrides */
       body.has-navbar-fixed-top {
@@ -161,10 +161,10 @@
       </article>
     </template>
     <script type="module">
-      import { marked } from 'https://unpkg.com/marked@5/lib/marked.esm.js';
-      import { markedHighlight } from 'https://unpkg.com/marked-highlight@1/src/index.js';
-      import hljs from 'https://unpkg.com/@highlightjs/cdn-assets@11/es/highlight.min.js';
-      import purify from 'https://unpkg.com/dompurify@3/dist/purify.es.js';
+      import { marked } from 'https://unpkg.com/marked@5.1.2/lib/marked.esm.js';
+      import { markedHighlight } from 'https://unpkg.com/marked-highlight@1.0.2/src/index.js';
+      import hljs from 'https://unpkg.com/@highlightjs/cdn-assets@11.10.0/es/highlight.min.js';
+      import purify from 'https://unpkg.com/dompurify@3.1.6/dist/purify.es.mjs';
 
       // Locale settings. Static atm.
       const LANG_CODE = document.documentElement.lang || navigator.language;
